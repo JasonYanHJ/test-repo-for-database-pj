@@ -87,7 +87,10 @@
 * 训练hifigan声码器:
 `python vocoder_train.py <trainid> <datasets_root> hifigan`
 > `<trainid>`替换为你想要的标识，同一标识再次训练时会延续原模型
-
+* 训练fregan声码器:
+`python vocoder_train.py <trainid> <datasets_root> --config config.json fregan`
+> `<trainid>`替换为你想要的标识，同一标识再次训练时会延续原模型
+* 将GAN声码器的训练切换为多GPU模式：修改GAN文件夹下.json文件中的"num_gpus"参数
 ### 3. 启动程序或工具箱
 您可以尝试使用以下命令：
 
@@ -105,7 +108,7 @@
 ### 4. 番外：语音转换Voice Conversion(PPG based)
 想像柯南拿着变声器然后发出毛利小五郎的声音吗？本项目现基于PPG-VC，引入额外两个模块（PPG extractor + PPG2Mel）, 可以实现变声功能。（文档不全，尤其是训练部分，正在努力补充中）
 #### 4.0 准备环境
-* 确保项目以上环境已经安装ok，运行`pip install -r requirements_vc.txt` 来安装剩余的必要包。
+* 确保项目以上环境已经安装ok，运行`pip install espnet` 来安装剩余的必要包。
 * 下载以下模型 链接：https://pan.baidu.com/s/1bl_x_DHJSAUyN2fma-Q_Wg 
 提取码：gh41
   * 24K采样率专用的vocoder（hifigan）到 *vocoder\saved_models\xxx*
@@ -139,6 +142,7 @@
 | --- | ----------- | ----- | --------------------- |
 | [1803.09017](https://arxiv.org/abs/1803.09017) | GlobalStyleToken (synthesizer)| Style Tokens: Unsupervised Style Modeling, Control and Transfer in End-to-End Speech Synthesis | 本代码库 |
 | [2010.05646](https://arxiv.org/abs/2010.05646) | HiFi-GAN (vocoder)| Generative Adversarial Networks for Efficient and High Fidelity Speech Synthesis | 本代码库 |
+| [2106.02297](https://arxiv.org/abs/2106.02297) | Fre-GAN (vocoder)| Fre-GAN: Adversarial Frequency-consistent Audio Synthesis | 本代码库 |
 |[**1806.04558**](https://arxiv.org/pdf/1806.04558.pdf) | SV2TTS | Transfer Learning from Speaker Verification to Multispeaker Text-To-Speech Synthesis | 本代码库 |
 |[1802.08435](https://arxiv.org/pdf/1802.08435.pdf) | WaveRNN (vocoder) | Efficient Neural Audio Synthesis | [fatchord/WaveRNN](https://github.com/fatchord/WaveRNN) |
 |[1703.10135](https://arxiv.org/pdf/1703.10135.pdf) | Tacotron (synthesizer) | Tacotron: Towards End-to-End Speech Synthesis | [fatchord/WaveRNN](https://github.com/fatchord/WaveRNN)
