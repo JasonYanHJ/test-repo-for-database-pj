@@ -18,10 +18,19 @@
 
 🌍 **Webserver Ready** 可伺服你的训练结果，供远程调用
 
+### 进行中的工作
+*  GUI/客户端大升级与合并
+[X] 初始化框架 `./mkgui` （基于streamlit + fastapi）和 [技术设计](https://vaj2fgg8yn.feishu.cn/docs/doccnvotLWylBub8VJIjKzoEaee)
+[X] 增加 Voice Cloning and Conversion的演示页面
+[X] 增加Voice Conversion的预处理preprocessing 和训练 training 页面 
+[ ] 增加其他的的预处理preprocessing 和训练 training 页面 
+* 模型后端基于ESPnet2升级
+
+
 ## 开始
 ### 1. 安装要求
 > 按照原始存储库测试您是否已准备好所有环境。
-**Python 3.7 或更高版本** 需要运行工具箱。
+运行工具箱(demo_toolbox.py)需要 **Python 3.7 或更高版本** 。
 
 * 安装 [PyTorch](https://pytorch.org/get-started/locally/)。
 > 如果在用 pip 方式安装的时候出现 `ERROR: Could not find a version that satisfies the requirement torch==1.9.0+cu102 (from versions: 0.1.2, 0.1.2.post1, 0.1.2.post2)` 这个错误可能是 python 版本过低，3.9 可以安装成功
@@ -68,7 +77,7 @@
 对效果影响不大，已经预置3款，如果希望自己训练可以参考以下命令。
 * 预处理数据:
 `python vocoder_preprocess.py <datasets_root> -m <synthesizer_model_path>`
-> `<datasets_root>`替换为你的数据集目录，`<synthesizer_model_path>`替换为一个你最好的synthesizer模型目录，例如 *sythensizer\saved_mode\xxx*
+> `<datasets_root>`替换为你的数据集目录，`<synthesizer_model_path>`替换为一个你最好的synthesizer模型目录，例如 *sythensizer\saved_models\xxx*
 
 
 * 训练wavernn声码器:
@@ -82,15 +91,10 @@
 ### 3. 启动程序或工具箱
 您可以尝试使用以下命令：
 
-### 3.1 启动Web程序：
+### 3.1 启动Web程序（v2）：
 `python web.py`
 运行成功后在浏览器打开地址, 默认为 `http://localhost:8080`
-![123](https://user-images.githubusercontent.com/12797292/135494044-ae59181c-fe3a-406f-9c7d-d21d12fdb4cb.png)
-> 注：目前界面比较buggy, 
-> * 第一次点击`录制`要等待几秒浏览器正常启动录音，否则会有重音
-> * 录制结束不要再点`录制`而是`停止`
 > * 仅支持手动新录音（16khz）, 不支持超过4MB的录音，最佳长度在5~15秒
-> * 默认使用第一个找到的模型，有动手能力的可以看代码修改 `web\__init__.py`。
 
 ### 3.2 启动工具箱：
 `python demo_toolbox.py -d <datasets_root>`
@@ -98,33 +102,35 @@
 
 <img width="1042" alt="d48ea37adf3660e657cfb047c10edbc" src="https://user-images.githubusercontent.com/7423248/134275227-c1ddf154-f118-4b77-8949-8c4c7daf25f0.png">
 
-## 文件结构（目标读者：开发者）
-```
-├─archived_untest_files 废弃文件
-├─encoder encoder模型
-│  ├─data_objects
-│  └─saved_models 预训练好的模型
-├─samples 样例语音
-├─synthesizer  synthesizer模型
-│  ├─models
-│  ├─saved_models 预训练好的模型
-│  └─utils 工具类库
-├─toolbox 图形化工具箱
-├─utils 工具类库
-├─vocoder  vocoder模型（目前包含hifi-gan、wavrnn）
-│  ├─hifigan
-│  ├─saved_models 预训练好的模型
-│  └─wavernn
-└─web
-    ├─api
-    │  └─Web端接口
-    ├─config
-    │  └─ Web端配置文件
-    ├─static 前端静态脚本
-    │  └─js 
-    ├─templates 前端模板
-    └─__init__.py Web端入口文件
-```
+### 4. 番外：语音转换Voice Conversion(PPG based)
+想像柯南拿着变声器然后发出毛利小五郎的声音吗？本项目现基于PPG-VC，引入额外两个模块（PPG extractor + PPG2Mel）, 可以实现变声功能。（文档不全，尤其是训练部分，正在努力补充中）
+#### 4.0 准备环境
+* 确保项目以上环境已经安装ok，运行`pip install -r requirements_vc.txt` 来安装剩余的必要包。
+* 下载以下模型 链接：https://pan.baidu.com/s/1bl_x_DHJSAUyN2fma-Q_Wg 
+提取码：gh41
+  * 24K采样率专用的vocoder（hifigan）到 *vocoder\saved_models\xxx*
+  * 预训练的ppg特征encoder(ppg_extractor)到 *ppg_extractor\saved_models\xxx*
+  * 预训练的PPG2Mel到 *ppg2mel\saved_models\xxx*
+
+#### 4.1 使用数据集自己训练PPG2Mel模型 (可选)
+
+* 下载aidatatang_200zh数据集并解压：确保您可以访问 *train* 文件夹中的所有音频文件（如.wav）
+* 进行音频和梅尔频谱图预处理：
+`python pre4ppg.py <datasets_root> -d {dataset} -n {number}`
+可传入参数：
+* `-d {dataset}` 指定数据集，支持 aidatatang_200zh, 不传默认为aidatatang_200zh
+* `-n {number}` 指定并行数，CPU 11770k在8的情况下，需要运行12到18小时！待优化
+> 假如你下载的 `aidatatang_200zh`文件放在D盘，`train`文件路径为 `D:\data\aidatatang_200zh\corpus\train` , 你的`datasets_root`就是 `D:\data\`
+
+* 训练合成器, 注意在上一步先下载好`ppg2mel.yaml`, 修改里面的地址指向预训练好的文件夹：
+`python ppg2mel_train.py --config .\ppg2mel\saved_models\ppg2mel.yaml --oneshotvc `
+* 如果想要继续上一次的训练，可以通过`--load .\ppg2mel\saved_models\<old_pt_file>` 参数指定一个预训练模型文件。
+
+#### 4.2 启动工具箱VC模式
+您可以尝试使用以下命令：
+`python demo_toolbox.py -vc -d <datasets_root>`
+> 请指定一个可用的数据集文件路径，如果有支持的数据集则会自动加载供调试，也同时会作为手动录制音频的存储目录。
+<img width="971" alt="微信图片_20220305005351" src="https://user-images.githubusercontent.com/7423248/156805733-2b093dbc-d989-4e68-8609-db11f365886a.png">
 
 ## 引用及论文
 > 该库一开始从仅支持英语的[Real-Time-Voice-Cloning](https://github.com/CorentinJ/Real-Time-Voice-Cloning) 分叉出来的，鸣谢作者。
