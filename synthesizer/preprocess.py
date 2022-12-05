@@ -14,9 +14,14 @@ data_info = {
         "trans_filepath": "transcript/aidatatang_200_zh_transcript.txt",
         "speak_func": preprocess_speaker_general
     },
-    "SLR68": {
+    "magicdata": {
         "subfolders": ["train"],
         "trans_filepath": "train/TRANS.txt",
+        "speak_func": preprocess_speaker_general
+    },
+    "aishell3":{
+        "subfolders": ["train/wav"],
+        "trans_filepath": "train/content.txt",
         "speak_func": preprocess_speaker_general
     },
 }

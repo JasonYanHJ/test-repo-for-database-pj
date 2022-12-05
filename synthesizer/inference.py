@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Union, List
 import numpy as np
 import librosa
-
+from pypinyin import lazy_pinyin, Style
 
 class Synthesizer:
     sample_rate = hparams.sample_rate
@@ -90,9 +90,10 @@ class Synthesizer:
 
             simple_table([("Tacotron", str(tts_k) + "k"),
                         ("r", self._model.r)])
+        texts = [" ".join(lazy_pinyin(v, style=Style.TONE3)) for v in texts]
 
         # Preprocess text inputs
-        inputs = [text_to_sequence(text.strip(), hparams.tts_cleaner_names) for text in texts]
+        inputs = [text_to_sequence(text, hparams.tts_cleaner_names) for text in texts]
         if not isinstance(embeddings, list):
             embeddings = [embeddings]
 
